@@ -1,48 +1,482 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sophia's Website</title>
-
+    <title>Sophia Cohen-Pelletier - Portfolio</title>
     <style>
-      body { 
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        font-family: 'Arial', sans-serif;
+      * {
         margin: 0;
         padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #0a0a0a;
+        color: #ffffff;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      /* Navigation Menu */
+      nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 1.5rem 0;
+        z-index: 1000;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      nav ul {
+        list-style: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 3rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      nav a {
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 500;
+        transition: color 0.3s ease;
+        position: relative;
+      }
+
+      nav a:hover {
+        color: #667eea;
+      }
+
+      nav a::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #667eea;
+        transition: width 0.3s ease;
+      }
+
+      nav a:hover::after {
+        width: 100%;
+      }
+
+      /* Sections */
+      section {
+        padding: 8rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      /* Hero Section */
+      #hero {
         min-height: 100vh;
         display: flex;
-        align-items: center;
+        flex-direction: column;
         justify-content: center;
-      }
-      
-      .container {
+        align-items: center;
         text-align: center;
-        padding: 2rem;
-      }
-      
-      h1 {
-        font-size: 3rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+        padding: 8rem 0;
+        max-width: none;
         margin: 0;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        animation: fadeIn 2s ease-in;
+        width: 100%;
       }
-      
+
+      #hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.4) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.4) 0%, transparent 50%);
+      }
+
+      #hero h1 {
+        font-size: 4rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        z-index: 1;
+        animation: fadeInUp 1s ease-out;
+      }
+
+      #hero p {
+        font-size: 1.5rem;
+        opacity: 0.9;
+        z-index: 1;
+        animation: fadeInUp 1s ease-out 0.2s both;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Section Headers */
+      h2 {
+        font-size: 2.5rem;
+        margin-bottom: 3rem;
+        text-align: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* Projects Section */
+      #projects {
+        background: #111111;
+      }
+
+      .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .project-card {
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: transform 0.3s ease, border-color 0.3s ease;
+      }
+
+      .project-card:hover {
+        transform: translateY(-5px);
+        border-color: #667eea;
+      }
+
+      .project-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        cursor: pointer;
+      }
+
+      .project-card-link:hover {
+        text-decoration: none;
+      }
+
+      .project-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #667eea;
+      }
+
+      .project-card p {
+        color: #cccccc;
+        margin-bottom: 1rem;
+      }
+
+      /* About Section */
+      #about {
+        background: #0a0a0a;
+      }
+
+      #about p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #cccccc;
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      /* Contact Section */
+      #contact {
+        background: #111111;
+        text-align: center;
+      }
+
+      #contact p {
+        font-size: 1.2rem;
+        color: #cccccc;
+        margin-bottom: 2rem;
+      }
+
+      .contact-form {
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: left;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #ffffff;
+        font-weight: 500;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 0.875rem;
+        background: #1a1a1a;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: #ffffff;
+        font-family: inherit;
+        font-size: 1rem;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 150px;
+      }
+
+      .submit-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1rem 2.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        width: 100%;
+        margin-top: 1rem;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .submit-btn:active {
+        transform: translateY(0);
+      }
+
+      .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .message {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        text-align: center;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .message.success {
+        background: rgba(40, 167, 69, 0.2);
+        border: 1px solid rgba(40, 167, 69, 0.5);
+        color: #4ade80;
+      }
+
+      .message.error {
+        background: rgba(220, 53, 69, 0.2);
+        border: 1px solid rgba(220, 53, 69, 0.5);
+        color: #f87171;
+      }
+
       @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
-      
-      @media (max-width: 600px) {
-        h1 { font-size: 2rem; }
+
+      /* Smooth Scroll */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Mobile Responsive */
+      @media (max-width: 768px) {
+        nav ul {
+          gap: 1.5rem;
+          flex-wrap: wrap;
+          padding: 0 1rem;
+        }
+
+        #hero h1 {
+          font-size: 2.5rem;
+        }
+
+        #hero p {
+          font-size: 1.2rem;
+        }
+
+        h2 {
+          font-size: 2rem;
+        }
+
+        section {
+          padding: 4rem 1.5rem;
+        }
+
+        #hero {
+          padding: 4rem 0;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1>Hello World! I'm Sophia!</h1>
-    </div>
+    <!-- Navigation Menu -->
+    <nav>
+      <ul>
+        <li><a href="#hero">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero">
+      <h1>Hello, I'm Sophia Cohen-Pelletier</h1>
+      <p>Welcome to my portfolio</p>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+      <h2>About Me</h2>
+      <p>
+        I am a 17 year old game developer currently attending Harvard-Westlake School
+        in Los Angeles, California. I will be updating this website regularly to
+        showcase my work. Additionally, you can follow me at @shebuildgames on Instagram
+        and YouTube!
+      </p>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+      <h2>Projects</h2>
+      <div class="projects-grid">
+        <a href="rab-bit.html" class="project-card-link">
+          <div class="project-card">
+            <h3>Rab-Bit</h3>
+            <p>The Rab-Bit game that was created during the Lightning Round of NHSGA 2025</p>
+          </div>
+        </a>
+        <a href="projectCitrus.html" class="project-card-link">
+          <div class="project-card">
+            <h3>Project Citrus</h3>
+            <p>This is an incomplete project that I am working on with a team. For now, it will stay secret, but follow @studiocitrus on Instagram for updates.</p>
+          </div>
+        </a>
+        <div class="project-card">
+          <h3>Project 3</h3>
+          <p>Coming soon...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>Get in touch with me to collaborate or learn more about my work. You can send me a message or email me directoy at scpbusiness08@gmail.com</p>
+      <form class="contact-form" id="contactForm">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" required></textarea>
+        </div>
+        <button type="submit" class="submit-btn" id="submitBtn">Send Message</button>
+        <div id="formMessage"></div>
+      </form>
+    </section>
+
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <script>
+      // Initialize EmailJS
+      // Replace 'YOUR_PUBLIC_KEY' with your actual EmailJS public key
+      (function() {
+        emailjs.init('YOUR_PUBLIC_KEY'); // Replace this with your EmailJS Public Key
+      })();
+
+      // Handle form submission
+      document.getElementById('contactForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const formMessage = document.getElementById('formMessage');
+        
+        // Disable button and show loading state
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        formMessage.innerHTML = '';
+        
+        // Get form data
+        const formData = {
+          from_name: document.getElementById('name').value,
+          from_email: document.getElementById('email').value,
+          message: document.getElementById('message').value,
+          to_name: 'Sophia Cohen-Pelletier' // Your name
+        };
+        
+        // Send email using EmailJS
+        // Replace 'YOUR_SERVICE_ID' and 'YOUR_TEMPLATE_ID' with your actual values
+        emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', formData)
+          .then(function(response) {
+            // Success
+            formMessage.innerHTML = '<div class="message success">Thank you! Your message has been sent successfully. I\'ll get back to you soon.</div>';
+            document.getElementById('contactForm').reset();
+            
+            // Clear success message after 5 seconds
+            setTimeout(function() {
+              formMessage.innerHTML = '';
+            }, 5000);
+          }, function(error) {
+            // Error
+            console.error('EmailJS Error:', error);
+            formMessage.innerHTML = '<div class="message error">Sorry, there was an error sending your message. Please try again later or contact me directly.</div>';
+          })
+          .finally(function() {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Message';
+          });
+      });
+    </script>
   </body>
 </html>

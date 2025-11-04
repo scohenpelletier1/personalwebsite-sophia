@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project Name</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #0a0a0a;
+        color: #ffffff;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      /* Navigation Menu */
+      nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 1.5rem 0;
+        z-index: 1000;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      nav ul {
+        list-style: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 3rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      nav a {
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 500;
+        transition: color 0.3s ease;
+        position: relative;
+      }
+
+      nav a:hover {
+        color: #667eea;
+      }
+
+      nav a::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #667eea;
+        transition: width 0.3s ease;
+      }
+
+      nav a:hover::after {
+        width: 100%;
+      }
+
+      /* Project Details Section */
+      .project-details {
+        margin-top: 80px;
+        padding: 4rem 2rem;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        color: #667eea;
+        text-decoration: none;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        transition: transform 0.2s ease;
+      }
+
+      .back-link:hover {
+        transform: translateX(-5px);
+      }
+
+      .back-link::before {
+        content: '←';
+        margin-right: 0.5rem;
+      }
+
+      .project-header {
+        margin-bottom: 3rem;
+      }
+
+      .project-header h1 {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .project-header p {
+        font-size: 1.3rem;
+        color: #cccccc;
+        max-width: 800px;
+      }
+
+      .project-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 3rem;
+        margin-top: 3rem;
+      }
+
+      .project-main {
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 2.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .project-main h2 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        color: #667eea;
+      }
+
+      .project-main p {
+        color: #cccccc;
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+        line-height: 1.8;
+      }
+
+      .project-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .project-info {
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .project-info h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #667eea;
+      }
+
+      .project-info ul {
+        list-style: none;
+        color: #cccccc;
+      }
+
+      .project-info li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .project-info li:last-child {
+        border-bottom: none;
+      }
+
+      .project-image {
+        width: 100%;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .project-links {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+
+      .project-link-btn {
+        display: inline-block;
+        padding: 0.875rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .project-link-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      /* Mobile Responsive */
+      @media (max-width: 968px) {
+        .project-content {
+          grid-template-columns: 1fr;
+        }
+
+        .project-header h1 {
+          font-size: 2.5rem;
+        }
+
+        nav ul {
+          gap: 1.5rem;
+          flex-wrap: wrap;
+          padding: 0 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Menu -->
+    <nav>
+      <ul>
+        <li><a href="index.html#hero">Home</a></li>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#projects">Projects</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- Project Details Section -->
+    <div class="project-details">
+      <a href="index.html#projects" class="back-link">Back to Projects</a>
+
+      <div class="project-header">
+        <h1>Project Name</h1>
+        <p>Add a brief description or tagline about your project here.</p>
+      </div>
+
+      <div class="project-content">
+        <div class="project-main">
+          <h2>About the Project</h2>
+          <p>
+            Add a detailed description of your project here. Explain what the project is,
+            what problem it solves, and what makes it unique. You can include multiple paragraphs
+            to provide comprehensive information about your work.
+          </p>
+          <p>
+            Include details about your development process, challenges you faced, and how you
+            overcame them. You can also mention any interesting features or technologies you used.
+          </p>
+
+          <h2>Features</h2>
+          <p>
+            <ul>
+              <li>Feature 1</li>
+              <li>Feature 2</li>
+              <li>Feature 3</li>
+              <li>Feature 4</li>
+          </ul>
+          </p>
+
+          <div class="project-links">
+            <a href="#" class="project-link-btn">View Demo</a>
+            <a href="#" class="project-link-btn">View on GitHub</a>
+          </div>
+        </div>
+
+        <div class="project-sidebar">
+          <div class="project-info">
+            <h3>Softwares Used:</h3>
+            <ul>
+              <li>Software 1</li>
+              <li>Software 2</li>
+              <li>Software 3</li>
+            </ul>
+          </div>
+
+          <div class="project-info">
+            <h3>Project Details</h3>
+            <ul>
+              <li><strong>Status:</strong> Status here</li>
+              <li><strong>Year:</strong> Year completed here</li>
+              <li><strong>Role:</strong> Your role here</li>
+              <li><strong>Team:</strong> Team name here</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
