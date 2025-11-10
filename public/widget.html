@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Planetary Motion and Kepler's Laws</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #0a0a0a;
+        color: #ffffff;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      /* Navigation Menu */
+      nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 1.5rem 0;
+        z-index: 1000;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      nav ul {
+        list-style: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 3rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      nav a {
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 500;
+        transition: color 0.3s ease;
+        position: relative;
+      }
+
+      nav a:hover {
+        color: #667eea;
+      }
+
+      nav a::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #667eea;
+        transition: width 0.3s ease;
+      }
+
+      nav a:hover::after {
+        width: 100%;
+      }
+
+      /* Project Details Section */
+      .project-details {
+        margin-top: 80px;
+        padding: 4rem 2rem;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        color: #667eea;
+        text-decoration: none;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        transition: transform 0.2s ease;
+      }
+
+      .back-link:hover {
+        transform: translateX(-5px);
+      }
+
+      .back-link::before {
+        content: '←';
+        margin-right: 0.5rem;
+      }
+
+      .project-header {
+        margin-bottom: 3rem;
+      }
+
+      .project-header h1 {
+        font-size: 3.2rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .project-header p {
+        font-size: 1.2rem;
+        color: #cccccc;
+        max-width: 900px;
+      }
+
+      .project-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 3rem;
+        margin-top: 3rem;
+      }
+
+      .project-main {
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 2.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .project-main h2 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        color: #667eea;
+      }
+
+      .project-main p {
+        color: #cccccc;
+        margin-bottom: 1.5rem;
+        font-size: 1.05rem;
+        line-height: 1.8;
+      }
+
+      .project-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .project-info {
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .project-info h3 {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+        color: #667eea;
+      }
+
+      .project-info ul {
+        list-style: none;
+        color: #cccccc;
+      }
+
+      .project-info li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .project-info li:last-child {
+        border-bottom: none;
+      }
+
+      /* Simulation */
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .control {
+        background: #141414;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+      }
+
+      .control label {
+        display: block;
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+        color: #dddddd;
+      }
+
+      .control .value {
+        color: #9ca3af;
+        margin-left: 0.25rem;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #667eea;
+      }
+
+      .control-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-right: 1rem;
+        font-size: 0.95rem;
+        color: #dddddd;
+      }
+
+      .control-btn {
+        display: inline-block;
+        padding: 0.6rem 1.25rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      }
+
+      .control-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(102, 126, 234, 0.35);
+      }
+
+      .control-btn.secondary {
+        background: #262626;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .sim-container {
+        background: #101010;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .sim-caption {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+        color: #a3a3a3;
+      }
+
+      .legend {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-right: 1rem;
+        white-space: nowrap;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .dot.star {
+        background: radial-gradient(circle at 30% 30%, #fff, #ffd26a);
+        box-shadow: 0 0 16px rgba(255, 210, 106, 0.8);
+      }
+
+      .dot.planet {
+        background: radial-gradient(circle at 30% 30%, #d4e4ff, #6ca0ff);
+        box-shadow: 0 0 12px rgba(108, 160, 255, 0.6);
+      }
+      .dot.focus2 {
+        background: radial-gradient(circle at 30% 30%, #f3e8ff, #c084fc);
+        box-shadow: 0 0 12px rgba(192, 132, 252, 0.5);
+      }
+
+      .readout {
+        color: #cbd5e1;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* Mobile Responsive */
+      @media (max-width: 968px) {
+        .project-content {
+          grid-template-columns: 1fr;
+        }
+
+        nav ul {
+          gap: 1.5rem;
+          flex-wrap: wrap;
+          padding: 0 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Menu -->
+    <nav>
+      <ul>
+        <li><a href="index.html#hero">Home</a></li>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#projects">Projects</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- Project Details Section -->
+    <div class="project-details">
+      <a href="index.html#projects" class="back-link">Back to Projects</a>
+
+      <div class="project-header">
+        <h1>Planetary Motion and Kepler's Laws</h1>
+        <p>Explore elliptical orbits and how orbital period relates to size. Adjust eccentricity, orbit size, and time scale to see how motion changes.</p>
+      </div>
+
+      <div class="project-content">
+        <div class="project-main">
+          <h2>Interactive Simulation</h2>
+
+          <div class="controls">
+            <div class="control">
+              <label for="presetSelect">Planet preset</label>
+              <select id="presetSelect" style="width: 100%; background:#1a1a1a; color:#fff; border:1px solid rgba(255,255,255,0.1); padding:0.6rem 0.5rem; border-radius:8px;">
+                <option value="custom" selected>Custom (manual)</option>
+                <option value="mercury">Mercury</option>
+                <option value="venus">Venus</option>
+                <option value="earth">Earth</option>
+                <option value="mars">Mars</option>
+                <option value="jupiter">Jupiter</option>
+                <option value="saturn">Saturn</option>
+                <option value="uranus">Uranus</option>
+                <option value="neptune">Neptune</option>
+              </select>
+            </div>
+            <div class="control">
+              <label for="eccSlider">Eccentricity e <span class="value" id="eccVal">0.30</span></label>
+              <input id="eccSlider" type="range" min="0" max="0.9" step="0.01" value="0.30">
+            </div>
+            <div class="control">
+              <label for="aSlider">Semi‑major axis a (AU) <span class="value" id="aVal">1.00</span></label>
+              <input id="aSlider" type="range" min="0.2" max="35" step="0.01" value="1">
+            </div>
+            <div class="control">
+              <label for="speedSlider">Time scale <span class="value" id="speedVal">1.0×</span></label>
+              <input id="speedSlider" type="range" min="0.1" max="5" step="0.1" value="1">
+            </div>
+            <div class="control">
+              <div class="control-row">
+                <label class="toggle">
+                  <input id="angleToggle" type="checkbox" checked>
+                  Show foci angle
+                </label>
+                <label class="toggle">
+                  <input id="velToggle" type="checkbox" checked>
+                  Show velocity
+                </label>
+              </div>
+              <div class="control-row" style="margin-top: 0.5rem;">
+                <button id="pauseBtn" class="control-btn">Pause</button>
+                <button id="resetBtn" class="control-btn secondary">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sim-container">
+            <canvas id="simCanvas" style="width: 100%; height: 520px; display: block;"></canvas>
+          </div>
+
+          <div class="sim-caption">
+            <div>
+              <span class="legend"><span class="dot star"></span> Star (focus)</span>
+              <span class="legend"><span class="dot planet"></span> Planet</span>
+              <span class="legend"><span class="dot focus2"></span> Other focus</span>
+            </div>
+            <div class="readout" id="readout1">r: — AU • v: — AU/yr</div>
+            <div class="readout" id="readout2">Perihelion: — AU • Aphelion: — AU • Period: — yr</div>
+          </div>
+        </div>
+
+        <div class="project-sidebar">
+          <div class="project-info">
+            <h3>What are Kepler's Laws?</h3>
+            <ul>
+              <li><strong>1. Orbits are ellipses:</strong> The orbit of a planet is an ellipse with the Sun at one of the two foci.</li>
+              <li><strong>2. Equal areas, equal times:</strong> A line segment joining a planet and the Sun sweeps out equal areas during equal intervals of time.</li>
+              <li><strong>3. Period relates to size:</strong> <em>T² ∝ a³</em>. The square of a planet's orbital period is proportional to the cube of the length of the semi-major axis of its orbit.</li>
+            </ul>
+          </div>
+          <div class="project-info">
+            <h3>How to Use</h3>
+            <ul>
+              <li>Drag <em>e</em> to change the eccentricity of the orbit (ellipse shape, 0 is circle).</li>
+              <li>Adjust the semi‑major axis <em>a</em> to resize the orbit. Period and scale update automatically.</li>
+              <li>Pick a planet preset to load real planetary orbit in our Solar System.</li>
+              <li>Toggle the velocity vector and angle measurements on and off.</li>
+              <li>Pause or adjust the speed of the simulation by using the time scale.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const eccSlider = document.getElementById('eccSlider');
+        const aSlider = document.getElementById('aSlider');
+        const speedSlider = document.getElementById('speedSlider');
+        const velToggle = document.getElementById('velToggle');
+        const angleToggle = document.getElementById('angleToggle');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const presetSelect = document.getElementById('presetSelect');
+
+        const eccVal = document.getElementById('eccVal');
+        const aVal = document.getElementById('aVal');
+        const speedVal = document.getElementById('speedVal');
+        const readout1 = document.getElementById('readout1');
+        const readout2 = document.getElementById('readout2');
+
+        // Units: AU (distance), years (time), so mu = 4*pi^2 AU^3/yr^2 for the Sun
+        const TAU = Math.PI * 2;
+        const mu = 4 * Math.PI * Math.PI;
+
+        let state = {
+          // state.a is the semi-major axis (AU)
+          a: parseFloat(aSlider.value),
+          e: parseFloat(eccSlider.value),
+          t: 0,
+          paused: false,
+          timeScale: parseFloat(speedSlider.value), // multiplier on dt
+          lastTimestamp: undefined,
+          showVelocity: velToggle.checked,
+          showFociAngle: angleToggle.checked
+        };
+
+        function resizeCanvas() {
+          const dpr = Math.max(1, window.devicePixelRatio || 1);
+          const cssWidth = canvas.clientWidth;
+          const cssHeight = canvas.clientHeight;
+          canvas.width = Math.floor(cssWidth * dpr);
+          canvas.height = Math.floor(cssHeight * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function meanMotion(a) {
+          return Math.sqrt(mu / (a * a * a));
+        }
+
+        function keplerSolveE(M, e) {
+          // Normalize M to [0, 2π) for stability
+          M = ((M % TAU) + TAU) % TAU;
+          // Robust initial guess (good for high e): see Odell & Gooding
+          let E = Math.atan2(Math.sin(M), Math.cos(M) - e);
+          // Refine with Newton iterations
+          for (let i = 0; i < 50; i++) {
+            const sE = Math.sin(E);
+            const cE = Math.cos(E);
+            const f = E - e * sE - M;
+            const fp = 1 - e * cE;
+            const d = f / fp;
+            E -= d;
+            if (Math.abs(d) < 1e-12) break;
+          }
+          return E;
+        }
+
+        function trueAnomalyFromE(E, e) {
+          // Stable form using atan2 to avoid tan(E/2) blowups near π
+          const sinHalf = Math.sin(E / 2);
+          const cosHalf = Math.cos(E / 2);
+          const y = Math.sqrt(1 + e) * sinHalf;
+          const x = Math.sqrt(1 - e) * cosHalf;
+          return 2 * Math.atan2(y, x);
+        }
+
+        function positionFromAnomalies(a, e, E) {
+          const nu = trueAnomalyFromE(E, e);
+          const r = a * (1 - e * Math.cos(E));
+          const x = r * Math.cos(nu);
+          const y = r * Math.sin(nu);
+          return { x, y, r, nu };
+        }
+
+        function velocityMagnitude(a, r) {
+          // Vis-viva equation: v^2 = mu*(2/r - 1/a)
+          return Math.sqrt(mu * (2 / r - 1 / a));
+        }
+
+        function computeScale(a, e, w, h) {
+          const maxR = a * (1 + e);
+          const margin = 24;
+          const s = Math.min((w - 2 * margin), (h - 2 * margin)) / (2 * maxR);
+          return { scale: s, margin };
+        }
+
+        function orbitalPeriodYears(a) {
+          // In AU/years units with mu = 4π^2, period is T = 2π * sqrt(a^3 / mu) = sqrt(a^3)
+          return Math.sqrt(a * a * a);
+        }
+
+        function rebuildReadouts(r, v) {
+          const a = state.a;
+          const peri = a * (1 - state.e);
+          const aphe = a * (1 + state.e);
+          const T = orbitalPeriodYears(a);
+          readout1.textContent = `r: ${r.toFixed(3)} AU • v: ${v.toFixed(3)} AU/yr`;
+          readout2.textContent = `Perihelion: ${peri.toFixed(3)} AU • Aphelion: ${aphe.toFixed(3)} AU • Period: ${T.toFixed(3)} yr`;
+        }
+
+        function drawScaleBar(pixelsPerAU) {
+          const cssW = canvas.clientWidth;
+          const cssH = canvas.clientHeight;
+          const targetPx = 120; // aim for ~120px bar
+          // Choose a "nice" AU length: 1, 2, 5 times power of 10
+          const rawUnits = targetPx / (pixelsPerAU || 1);
+          const pow10 = Math.pow(10, Math.floor(Math.log10(rawUnits)));
+          const candidates = [1, 2, 5].map(k => k * pow10);
+          let units = candidates[0];
+          for (let i = 0; i < candidates.length; i++) {
+            if (candidates[i] <= rawUnits) units = candidates[i];
+          }
+          const barPx = units * pixelsPerAU;
+          const margin = 16;
+          const y = cssH - margin - 8;
+          const x0 = margin;
+          const x1 = margin + barPx;
+          ctx.save();
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+          ctx.beginPath();
+          ctx.moveTo(x0, y);
+          ctx.lineTo(x1, y);
+          ctx.stroke();
+          // end caps
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(x0, y - 6);
+          ctx.lineTo(x0, y + 6);
+          ctx.moveTo(x1, y - 6);
+          ctx.lineTo(x1, y + 6);
+          ctx.stroke();
+          // label
+          ctx.fillStyle = 'rgba(203,213,225,0.95)';
+          ctx.font = '12px Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+          ctx.fillText(`${units.toFixed(units < 1 ? 2 : 1)} AU`, x0, y - 8);
+          ctx.restore();
+        }
+
+        // Planet presets (mean orbital elements)
+        const PRESETS = {
+          mercury: { a: 0.3871, e: 0.2056 },
+          venus:   { a: 0.7233, e: 0.0068 },
+          earth:   { a: 1.0000, e: 0.0167 },
+          mars:    { a: 1.5237, e: 0.0934 },
+          jupiter: { a: 5.2028, e: 0.0484 },
+          saturn:  { a: 9.5371, e: 0.0542 },
+          uranus:  { a: 19.191, e: 0.0472 },
+          neptune: { a: 30.068, e: 0.0086 }
+        };
+
+        function drawOrbitPath(a, e, scale, cx, cy) {
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.beginPath();
+          const steps = 360;
+          for (let i = 0; i <= steps; i++) {
+            const E = (i / steps) * TAU;
+            const p = positionFromAnomalies(a, e, E);
+            const px = p.x * scale;
+            const py = -p.y * scale;
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        function drawStar(cx, cy) {
+          ctx.save();
+          const grad = ctx.createRadialGradient(cx - 2, cy - 2, 2, cx, cy, 12);
+          grad.addColorStop(0, '#fff9c2');
+          grad.addColorStop(1, '#f6c453');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 6, 0, TAU);
+          ctx.fill();
+          ctx.shadowColor = 'rgba(255, 210, 106, 0.8)';
+          ctx.shadowBlur = 16;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 3, 0, TAU);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+          ctx.restore();
+        }
+
+        function drawPlanet(px, py) {
+          ctx.save();
+          const r = 5;
+          const grad = ctx.createRadialGradient(px - 1, py - 1, 1, px, py, r + 2);
+          grad.addColorStop(0, '#e8f1ff');
+          grad.addColorStop(1, '#6ca0ff');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(px, py, r, 0, TAU);
+          ctx.fill();
+          ctx.shadowColor = 'rgba(108, 160, 255, 0.6)';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(px, py, r - 2, 0, TAU);
+          ctx.fillStyle = '#cfe2ff';
+          ctx.fill();
+          ctx.restore();
+        }
+
+        function drawOtherFocus(fx, fy) {
+          ctx.save();
+          const r = 5;
+          const grad = ctx.createRadialGradient(fx - 1, fy - 1, 1, fx, fy, r + 2);
+          grad.addColorStop(0, '#f3e8ff');
+          grad.addColorStop(1, '#c084fc');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(fx, fy, r, 0, TAU);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        function drawFociAngle(px, py, f1x, f1y, f2x, f2y, angleRad) {
+          // guide lines
+          ctx.save();
+          ctx.strokeStyle = 'rgba(148, 163, 184, 0.6)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+          ctx.lineTo(f1x, f1y);
+          ctx.moveTo(px, py);
+          ctx.lineTo(f2x, f2y);
+          ctx.stroke();
+          // arc
+          const a1 = Math.atan2(f1y - py, f1x - px);
+          const a2 = Math.atan2(f2y - py, f2x - px);
+          let start = a1, end = a2;
+          // normalize to shortest arc
+          let d = ((end - start + Math.PI) % (2 * Math.PI)) - Math.PI;
+          end = start + d;
+          const r = 26;
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(99, 102, 241, 0.9)';
+          ctx.lineWidth = 2;
+          ctx.arc(px, py, r, start, end, d < 0);
+          ctx.stroke();
+          // label
+          const mid = start + d / 2;
+          const lx = px + (r + 12) * Math.cos(mid);
+          const ly = py + (r + 12) * Math.sin(mid);
+          ctx.fillStyle = 'rgba(203,213,225,0.95)';
+          ctx.font = '12px Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+          const deg = (Math.abs(d) * 180 / Math.PI).toFixed(1) + '°';
+          ctx.fillText(deg, lx, ly);
+          ctx.restore();
+        }
+
+        function drawVelocity(px, py, vx, vy, scale) {
+          const mag = Math.hypot(vx, vy);
+          const len = 40 * Math.min(1.5, Math.max(0.4, mag)); // scaled arrow length
+          const ux = vx / (mag || 1);
+          const uy = vy / (mag || 1);
+          const ex = px + ux * len;
+          const ey = py - uy * len;
+          ctx.save();
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.9)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+          ctx.lineTo(ex, ey);
+          ctx.stroke();
+          // Arrow head
+          const angle = Math.atan2(-(ey - py), ex - px);
+          const ah = 8;
+          ctx.beginPath();
+          ctx.moveTo(ex, ey);
+          ctx.lineTo(ex - ah * Math.cos(angle - Math.PI / 6), ey + ah * Math.sin(angle - Math.PI / 6));
+          ctx.lineTo(ex - ah * Math.cos(angle + Math.PI / 6), ey + ah * Math.sin(angle + Math.PI / 6));
+          ctx.closePath();
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.9)';
+          ctx.fill();
+          ctx.restore();
+        }
+
+        function animate(ts) {
+          if (state.lastTimestamp === undefined) state.lastTimestamp = ts;
+          const dtMs = Math.min(32, ts - state.lastTimestamp);
+          state.lastTimestamp = ts;
+          const dt = (dtMs / 1000) * (1 / 6); // base sim step in years (≈2 months/sec at 1×)
+          const a = state.a;
+          const n = meanMotion(a);
+          const T = TAU / n; // years
+
+          const cssW = canvas.clientWidth;
+          const cssH = canvas.clientHeight;
+          ctx.clearRect(0, 0, cssW, cssH);
+
+          const { scale, margin } = computeScale(a, state.e, cssW, cssH);
+          const cx = cssW / 2 + a * state.e * scale; // shift so star (focus) is centered
+          const cy = cssH / 2;
+
+          // Advance time
+          if (!state.paused) {
+            const advance = dt * state.timeScale;
+            state.t += advance;
+          }
+
+          // Current orbital position
+          const M = n * state.t;
+          const E = keplerSolveE(M, state.e);
+          const p = positionFromAnomalies(a, state.e, E);
+          const vMag = velocityMagnitude(a, p.r);
+          // Orthonormal frame at planet (guard against degenerate r)
+          const invR = p.r > 1e-12 ? 1 / p.r : 0;
+          const urx = p.x * invR;
+          const ury = p.y * invR;
+          const utx = -ury;
+          const uty = urx;
+          const vx = utx * vMag;
+          const vy = uty * vMag;
+
+          rebuildReadouts(p.r, vMag);
+
+          // Draw
+          drawOrbitPath(a, state.e, scale, cx, cy);
+          drawStar(cx, cy);
+          const px = cx + p.x * scale;
+          const py = cy - p.y * scale;
+          // optionally draw other focus and angle at planet
+          let angleText = '';
+          if (state.showFociAngle) {
+            const c = a * state.e;
+            const f2x = cx + (-2 * c) * scale;
+            const f2y = cy;
+            if (state.e > 1e-6) {
+              drawOtherFocus(f2x, f2y);
+              const v1x = cx - px, v1y = cy - py;
+              const v2x = f2x - px, v2y = f2y - py;
+              const dot = v1x * v2x + v1y * v2y;
+              const m1 = Math.hypot(v1x, v1y), m2 = Math.hypot(v2x, v2y);
+              if (m1 > 1e-9 && m2 > 1e-9) {
+                let cosA = dot / (m1 * m2);
+                cosA = Math.max(-1, Math.min(1, cosA));
+                const ang = Math.acos(cosA);
+                drawFociAngle(px, py, cx, cy, f2x, f2y, ang);
+              }
+            }
+          }
+          if (state.showVelocity) drawVelocity(px, py, vx, vy, scale);
+          drawPlanet(px, py);
+          const base = `r: ${p.r.toFixed(3)} AU • v: ${vMag.toFixed(3)} AU/yr`;
+          document.getElementById('readout1').textContent = base + angleText;
+          drawScaleBar(scale);
+
+          requestAnimationFrame(animate);
+        }
+
+        // UI Handlers
+        eccSlider.addEventListener('input', () => {
+          state.e = parseFloat(eccSlider.value);
+          eccVal.textContent = state.e.toFixed(2);
+        });
+        aSlider.addEventListener('input', () => {
+          state.a = parseFloat(aSlider.value);
+          aVal.textContent = state.a.toFixed(2);
+        });
+        speedSlider.addEventListener('input', () => {
+          state.timeScale = parseFloat(speedSlider.value);
+          speedVal.textContent = state.timeScale.toFixed(1) + '×';
+        });
+        velToggle.addEventListener('change', () => {
+          state.showVelocity = velToggle.checked;
+        });
+        angleToggle.addEventListener('change', () => {
+          state.showFociAngle = angleToggle.checked;
+        });
+        presetSelect.addEventListener('change', () => {
+          const key = presetSelect.value;
+          if (key !== 'custom' && PRESETS[key]) {
+            const { a, e } = PRESETS[key];
+            state.a = a;
+            state.e = e;
+            aSlider.value = a.toFixed(2);
+            eccSlider.value = e.toFixed(2);
+            aVal.textContent = parseFloat(aSlider.value).toFixed(2);
+            eccVal.textContent = parseFloat(eccSlider.value).toFixed(2);
+            state.t = 0; // restart from perihelion reference
+          }
+        });
+        pauseBtn.addEventListener('click', () => {
+          state.paused = !state.paused;
+          pauseBtn.textContent = state.paused ? 'Resume' : 'Pause';
+        });
+        resetBtn.addEventListener('click', () => {
+          state.t = 0;
+        });
+
+        // Initialize readouts
+        eccVal.textContent = state.e.toFixed(2);
+        aVal.textContent = state.a.toFixed(2);
+        speedVal.textContent = state.timeScale.toFixed(1) + '×';
+        rebuildReadouts(state.a * (1 - state.e), 0);
+
+        requestAnimationFrame(animate);
+      })();
+    </script>
+  </body>
+</html>
