@@ -59,6 +59,59 @@ emailjs.send('service_abc123', 'template_xyz789', formData);
 
 That's it! Your contact form should now send emails to your specified email address.
 
+## Planets Database Page Setup (Firebase Firestore)
+
+The planets page (`planets.html`) displays data from your Firestore "planets" collection. Follow these steps to connect it:
+
+### 1. Get Your Firebase Configuration
+
+1. Go to the [Firebase Console](https://console.firebase.google.com/)
+2. Select your project: **personalwebsite-sophia**
+3. Click the gear icon ⚙️ next to "Project Overview"
+4. Select **Project Settings**
+5. Scroll down to **Your apps** section
+6. If you don't have a web app yet:
+   - Click **Add app** → Select the **Web** icon (`</>`)
+   - Register your app (you can use any nickname)
+   - Copy the configuration object
+7. If you already have a web app, click on it and copy the configuration
+
+### 2. Update the Planets Page
+
+1. Open `public/planets.html`
+2. Find the `firebaseConfig` object (around line 200)
+3. Replace the placeholder values with your actual Firebase config:
+
+```javascript
+const firebaseConfig = {
+  apiKey: "your-actual-api-key",
+  authDomain: "personalwebsite-sophia.firebaseapp.com",
+  projectId: "personalwebsite-sophia",
+  storageBucket: "personalwebsite-sophia.appspot.com",
+  messagingSenderId: "your-messaging-sender-id",
+  appId: "your-app-id"
+};
+```
+
+### 3. Ensure Firestore is Enabled
+
+1. In Firebase Console, go to **Firestore Database**
+2. Make sure your database is created and the "planets" collection exists
+3. Add some test documents to your "planets" collection if needed
+
+### 4. Test the Page
+
+1. Open `planets.html` in your browser (or deploy to Firebase Hosting)
+2. The page should automatically load and display all documents from your "planets" collection
+3. Each document will be displayed as a card showing all its fields
+
+### Notes
+
+- The page automatically displays all fields from each planet document
+- Field names are automatically formatted (capitalized, underscores replaced with spaces)
+- The page handles empty collections gracefully
+- Make sure your Firestore security rules allow read access (check `firestore.rules`)
+
 ## Project Template Usage
 
 The `projectTemplate.html` file is a reusable template for creating project detail pages. Here's how to use it:
