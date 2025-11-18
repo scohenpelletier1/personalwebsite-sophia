@@ -86,33 +86,6 @@
         margin-right: auto;
       }
       
-      /* Two-column layout */
-      .game-layout {
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        gap: 2rem;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1rem;
-      }
-      
-      .left-col {
-        flex: 0 0 320px;
-      }
-      
-      .right-col {
-        flex: 1 1 auto;
-        min-width: 0;
-      }
-      
-      .center-col {
-        flex: 0 0 auto;
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-      }
-      
       h1 {
         font-size: 3rem;
         margin-bottom: 0.5rem;
@@ -138,6 +111,44 @@
         gap: 1rem;
         margin: 1rem 0 2rem;
         flex-wrap: wrap;
+      }
+      
+      /* Move score/best/New Game to right-hand side */
+      .top-bar {
+        position: fixed;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 260px;
+        z-index: 900;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        margin: 0; /* detach from document flow */
+      }
+      
+      .top-bar .scores {
+        flex-direction: column;
+      }
+      
+      .top-bar .score-box {
+        width: 100%;
+      }
+      
+      .top-bar .new-game-btn {
+        width: 100%;
+      }
+      
+      .name-box {
+        margin: 0.5rem 0;
+      }
+      
+      .name-box input {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: #0a0a0a;
+        color: #ffffff;
       }
       
       .scores {
@@ -184,6 +195,12 @@
         box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
       }
       
+      /* Improve tap/click targets */
+      .new-game-btn {
+        min-height: 44px;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
       /* Board */
       .board-wrapper {
         display: flex;
@@ -214,6 +231,9 @@
       .board.game-over .cell,
       .board.game-over .tile {
         opacity: 0;
+      }
+      .board.game-over .overlay {
+        pointer-events: auto; /* allow overlay buttons to be clickable */
       }
       
       .cell {
@@ -284,6 +304,7 @@
         align-items: center;
         justify-content: center;
         border-radius: 12px;
+        z-index: 1200;
       }
       
       .overlay.active {
@@ -326,6 +347,8 @@
         border-radius: 8px;
         cursor: pointer;
         transition: background 0.2s ease, transform 0.2s ease;
+        min-height: 44px;
+        -webkit-tap-highlight-color: transparent;
       }
       
       .btn.primary {
@@ -352,15 +375,33 @@
           padding: 2rem 1rem;
         }
         
-        .game-layout {
-          flex-direction: column;
+        /* On mobile, restore top bar inline above the board */
+        .top-bar {
+          position: static;
+          transform: none;
+          width: auto;
+          flex-direction: row;
           align-items: center;
+          justify-content: space-between;
+          margin: 1rem 0 2rem;
         }
         
-        .left-col,
-        .center-col,
-        .right-col {
-          width: 100%;
+        .top-bar .scores {
+          flex-direction: row;
+        }
+        
+        .top-bar .score-box,
+        .top-bar .new-game-btn {
+          width: auto;
+        }
+        
+        /* On mobile, keep leaderboard inline below the board */
+        #leaderboard {
+          position: static !important;
+          transform: none !important;
+          width: auto !important;
+          left: auto !important;
+          margin: 1.25rem auto 0 !important;
         }
       }
     </style>
@@ -378,94 +419,93 @@
     </nav>
     
     <main>
-      <div class="game-layout">
-        <div class="left-col">
-          <div class="leaderboard" id="leaderboard" style="margin-top: 0.5rem;">
-            <h2 style="font-size: 1.4rem; margin-bottom: 0.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Leaderboard</h2>
-            <div id="leaderboardContent" class="leaderboard-list" style="background:#1a1a1a; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:0.5rem;">
-              <!-- Filled dynamically -->
-            </div>
+      <h1>2048</h1>
+      <p class="subtitle">Join the numbers to get to <strong>2048</strong>!</p>
+      
+      <div class="top-bar">
+        <div class="scores">
+          <div class="score-box">
+            <div class="label">Score</div>
+            <div class="value" id="scoreValue">0</div>
+          </div>
+          <div class="score-box">
+            <div class="label">Best</div>
+            <div class="value" id="bestValue">0</div>
           </div>
         </div>
-        
-        <div class="center-col">
-          <div class="board-wrapper">
-            <div class="board" id="board">
-              <!-- background cells (static) -->
-              <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-              <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-              <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-              <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-              <div class="overlay" id="overlay">
-                <div class="overlay-card">
-                  <h2 id="overlayTitle">Game Over</h2>
-                  <p id="overlayText">No more moves available.</p>
-                  <div class="overlay-actions">
-                    <button class="btn" id="keepPlayingBtn" style="display:none;">Keep Playing</button>
-                    <button class="btn primary" id="tryAgainBtn">Try Again</button>
-                  </div>
-                </div>
+        <button class="new-game-btn" id="newGameBtn">New Game</button>
+      </div>
+      
+      <div class="board-wrapper">
+        <div class="board" id="board">
+          <!-- background cells (static) -->
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="overlay" id="overlay">
+            <div class="overlay-card">
+              <h2 id="overlayTitle">Game Over</h2>
+              <p id="overlayText">No more moves available.</p>
+              <div id="submitScore" class="submit-score" style="display:none; margin: 0.75rem 0 1rem;">
+                <input id="playerName" type="text" placeholder="Your name" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background:#0a0a0a; color:#fff; margin-bottom: 0.6rem;">
+                <button class="btn primary" id="submitScoreBtn" style="width:100%;">Submit Score</button>
+              </div>
+              <div class="overlay-actions">
+                <button class="btn" id="keepPlayingBtn" style="display:none;">Keep Playing</button>
+                <button class="btn primary" id="tryAgainBtn">Try Again</button>
               </div>
             </div>
           </div>
-        </div>
-        
-        <div class="right-col">
-          <h1>2048</h1>
-          <p class="subtitle">Join the numbers to get to <strong>2048</strong>!</p>
-          
-          <div class="top-bar">
-            <div class="scores">
-              <div class="score-box">
-                <div class="label">Score</div>
-                <div class="value" id="scoreValue">0</div>
-              </div>
-              <div class="score-box">
-                <div class="label">Best</div>
-                <div class="value" id="bestValue">0</div>
-              </div>
-            </div>
-            <button class="new-game-btn" id="newGameBtn">New Game</button>
-          </div>
-          
-          <!-- Name + Submit on the right -->
-          <div id="submitScore" class="submit-score" style="display:none; margin: 0.5rem 0 1rem;">
-            <div style="display:flex; gap:0.5rem;">
-              <input id="playerName" type="text" placeholder="Your name" style="flex:1; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background:#0a0a0a; color:#fff;">
-              <button class="new-game-btn" id="submitScoreBtn" style="padding:0.6rem 1rem;">Submit</button>
-            </div>
-          </div>
-          
-          <p class="instructions">
-            Use <span class="kbd">←</span> <span class="kbd">↑</span> <span class="kbd">→</span> <span class="kbd">↓</span> on desktop, or swipe on mobile.
-          </p>
         </div>
       </div>
+      
+      <div class="leaderboard" id="leaderboard" style="max-width: 520px; margin: 1.25rem auto 0;">
+        <h2 style="font-size: 1.4rem; margin-bottom: 0.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Leaderboard</h2>
+        <div id="leaderboardContent" class="leaderboard-list" style="background:#1a1a1a; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:0.5rem;">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+      
+      <p class="instructions">
+        Use <span class="kbd">←</span> <span class="kbd">↑</span> <span class="kbd">→</span> <span class="kbd">↓</span> on desktop, or swipe on mobile.
+      </p>
     </main>
     
     <script type="module">
       // Firebase SDK (Firestore) for leaderboard
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-      import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+      import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
+      import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs, where, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
       
       // TODO: Replace with your actual Firebase config (same project as planets.html)
       const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
+        apiKey: "AIzaSyBfI4fKwSsMCQPELyx9Z6wJpgUgMdx7Y6Y",
         authDomain: "personalwebsite-sophia.firebaseapp.com",
         projectId: "personalwebsite-sophia",
-        storageBucket: "personalwebsite-sophia.appspot.com",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID"
+        storageBucket: "personalwebsite-sophia.firebasestorage.app",
+        messagingSenderId: "548065891909",
+        appId: "1:548065891909:web:c3fbce9724b8e01b93f52c",
+        measurementId: "G-8RZZFZRFFH"
       };
-      
+
+      // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+      // Analytics can fail on non-HTTPS or if not available; don't block the app
+      try {
+        const analytics = getAnalytics(app);
+      } catch (err) {
+        console.warn('Analytics not initialized:', err && err.message ? err.message : err);
+      }
+      
       const GRID_SIZE = 4;
       const START_TILES = 2;
       const SPAWN_4_CHANCE = 0.1; // 10%
       const BEST_SCORE_KEY = 'bestScore2048';
       const GAP = 12; // must match CSS .board gap
       const PADDING = 12; // must match CSS .board padding
+      const PLAYER_NAME_KEY = 'playerName2048';
       
       let board = [];
       let score = 0;
@@ -473,6 +513,29 @@
       let hasWon = false;
       let cellSize = 0;
       let isAnimating = false;
+      
+      // Cookie helpers for leaderboard name
+      function setCookie(name, value, days) {
+        const d = new Date();
+        d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+        let cookie = `${name}=${encodeURIComponent(value)}; expires=${d.toUTCString()}; path=/; SameSite=Lax`;
+        if (location.protocol === 'https:') {
+          cookie += '; Secure';
+        }
+        document.cookie = cookie;
+      }
+      
+      function getCookie(name) {
+        const nameEQ = name + '=';
+        const parts = document.cookie.split(';');
+        for (let part of parts) {
+          part = part.trim();
+          if (part.indexOf(nameEQ) === 0) {
+            return decodeURIComponent(part.substring(nameEQ.length));
+          }
+        }
+        return '';
+      }
       
       const boardEl = document.getElementById('board');
       const scoreEl = document.getElementById('scoreValue');
@@ -487,9 +550,39 @@
       const playerNameInput = document.getElementById('playerName');
       const submitScoreBtn = document.getElementById('submitScoreBtn');
       const leaderboardContent = document.getElementById('leaderboardContent');
+      const playerNameSidebarEl = document.getElementById('playerNameSidebar');
+      const topBarEl = document.querySelector('.top-bar');
+      const leaderboardEl = document.getElementById('leaderboard');
       
       // Firestore collection for scores
-      const scoresCollection = collection(db, 'leaderboard_2048');
+      const scoresCollection = collection(db, 'leaderboard');
+      
+      async function upsertLeaderboardScore(playerName, playerScore) {
+        // Find existing record for this name (case-sensitive match)
+        const existingQ = query(scoresCollection, where('name', '==', playerName), limit(1));
+        const existingSnap = await getDocs(existingQ);
+        if (existingSnap.empty) {
+          await addDoc(scoresCollection, {
+            name: playerName,
+            score: playerScore,
+            createdAt: serverTimestamp()
+          });
+          return true;
+        } else {
+          const existingDoc = existingSnap.docs[0];
+          const data = existingDoc.data() || {};
+          const prevScore = typeof data.score === 'number' ? data.score : 0;
+          if (playerScore > prevScore) {
+            const ref = doc(db, 'leaderboard', existingDoc.id);
+            await updateDoc(ref, {
+              score: playerScore,
+              createdAt: serverTimestamp()
+            });
+            return true;
+          }
+          return false;
+        }
+      }
       
       function loadBestScore() {
         const stored = localStorage.getItem(BEST_SCORE_KEY);
@@ -499,6 +592,13 @@
       
       function saveBestScore() {
         localStorage.setItem(BEST_SCORE_KEY, String(bestScore));
+      }
+      
+      function loadPlayerName() {
+        // Prefer cookie for leaderboard name; fall back to localStorage if present
+        const stored = getCookie(PLAYER_NAME_KEY) || localStorage.getItem(PLAYER_NAME_KEY) || '';
+        if (playerNameSidebarEl) playerNameSidebarEl.value = stored;
+        if (playerNameInput) playerNameInput.value = stored;
       }
       
       function startNewGame() {
@@ -675,6 +775,43 @@
         cellSize = Math.floor((contentWidth - GAP * (GRID_SIZE - 1)) / GRID_SIZE);
       }
       
+      function positionTopBar() {
+        // Skip when in mobile layout (top-bar is static)
+        if (window.matchMedia('(max-width: 768px)').matches) {
+          if (topBarEl) topBarEl.style.left = '';
+          return;
+        }
+        const rect = boardEl.getBoundingClientRect();
+        const boardRight = rect.right;
+        const viewportWidth = window.innerWidth;
+        const centerX = boardRight + (viewportWidth - boardRight) / 2;
+        if (topBarEl) {
+          topBarEl.style.left = centerX + 'px';
+        }
+      }
+      
+      function positionLeaderboard() {
+        // Skip when in mobile layout (leaderboard is static)
+        if (window.matchMedia('(max-width: 768px)').matches) {
+          if (leaderboardEl) leaderboardEl.style.left = '';
+          if (leaderboardEl) leaderboardEl.style.position = '';
+          if (leaderboardEl) leaderboardEl.style.top = '';
+          if (leaderboardEl) leaderboardEl.style.transform = '';
+          return;
+        }
+        if (!leaderboardEl) return;
+        // Ensure fixed and vertically centered
+        leaderboardEl.style.position = 'fixed';
+        leaderboardEl.style.top = '50%';
+        leaderboardEl.style.transform = 'translate(-50%, -50%)';
+        leaderboardEl.style.width = '260px';
+        leaderboardEl.style.zIndex = '900';
+        const rect = boardEl.getBoundingClientRect();
+        const boardLeft = rect.left;
+        const centerX = boardLeft / 2;
+        leaderboardEl.style.left = centerX + 'px';
+      }
+      
       function coordsToLeftTop(r, c) {
         return {
           left: PADDING + c * (cellSize + GAP),
@@ -786,6 +923,19 @@
         overlayTextEl.textContent = text;
         keepPlayingBtn.style.display = showKeepPlaying ? 'inline-block' : 'none';
         submitScoreContainer.style.display = showSubmit ? 'block' : 'none';
+        // Prefill name from localStorage/sidebar when submitting
+        if (showSubmit) {
+          const stored = getCookie(PLAYER_NAME_KEY) || localStorage.getItem(PLAYER_NAME_KEY) || '';
+          if (stored && playerNameInput) playerNameInput.value = stored;
+          // If empty, mirror what's in the sidebar
+          if (!stored && playerNameSidebarEl && playerNameInput) {
+            playerNameInput.value = (playerNameSidebarEl.value || '').trim();
+          }
+          // Only ask for name once: if stored exists, hide the input
+          if (playerNameInput) {
+            playerNameInput.style.display = stored ? 'none' : 'block';
+          }
+        }
         overlayEl.classList.add('active');
       }
       
@@ -797,16 +947,16 @@
       window.addEventListener('keydown', (e) => {
         if (isAnimating) return;
         const key = e.key;
-        if (key === 'ArrowLeft' || key === 'a' || key === 'A') {
+        if (key === 'ArrowLeft') {
           e.preventDefault();
           move('left');
-        } else if (key === 'ArrowRight' || key === 'd' || key === 'D') {
+        } else if (key === 'ArrowRight') {
           e.preventDefault();
           move('right');
-        } else if (key === 'ArrowUp' || key === 'w' || key === 'W') {
+        } else if (key === 'ArrowUp') {
           e.preventDefault();
           move('up');
-        } else if (key === 'ArrowDown' || key === 's' || key === 'S') {
+        } else if (key === 'ArrowDown') {
           e.preventDefault();
           move('down');
         }
@@ -851,17 +1001,20 @@
       tryAgainBtn.addEventListener('click', startNewGame);
       keepPlayingBtn.addEventListener('click', hideOverlay);
       submitScoreBtn.addEventListener('click', async () => {
-        const name = (playerNameInput.value || '').trim();
+        let name = (playerNameInput.value || '').trim();
+        if (!name && playerNameSidebarEl) {
+          name = (playerNameSidebarEl.value || '').trim();
+          if (playerNameInput) playerNameInput.value = name;
+        }
         if (!name) {
           playerNameInput.focus();
           return;
         }
         try {
-          await addDoc(scoresCollection, {
-            name,
-            score,
-            createdAt: serverTimestamp()
-          });
+          // Upsert to ensure single record per name with highest score
+          await upsertLeaderboardScore(name, score);
+          // Persist name in a cookie for future sessions
+          setCookie(PLAYER_NAME_KEY, name, 365);
           playerNameInput.value = '';
           submitScoreContainer.style.display = 'none';
           await fetchLeaderboard();
@@ -870,10 +1023,29 @@
         }
       });
       
+      if (playerNameSidebarEl) {
+        playerNameSidebarEl.addEventListener('input', (e) => {
+          const val = (e.target.value || '').trim();
+          setCookie(PLAYER_NAME_KEY, val, 365);
+          if (playerNameInput && submitScoreContainer.style.display !== 'none') {
+            playerNameInput.value = val;
+          }
+        });
+      }
+      
       async function fetchLeaderboard() {
         try {
-          const q = query(scoresCollection, orderBy('score', 'desc'), orderBy('createdAt', 'asc'), limit(10));
-          const snapshot = await getDocs(q);
+          // Prefer score desc + createdAt asc (stable), may need composite index
+          let qRef = query(scoresCollection, orderBy('score', 'desc'), orderBy('createdAt', 'asc'), limit(10));
+          let snapshot;
+          try {
+            snapshot = await getDocs(qRef);
+          } catch (err) {
+            // Fallback if composite index not ready
+            console.warn('Composite index query failed, falling back to score-only:', err && err.code ? err.code : err);
+            qRef = query(scoresCollection, orderBy('score', 'desc'), limit(10));
+            snapshot = await getDocs(qRef);
+          }
           if (snapshot.empty) {
             leaderboardContent.innerHTML = '<div style="color:#ccc; padding:0.5rem 0.6rem;">No scores yet. Be the first!</div>';
             return;
@@ -900,12 +1072,17 @@
         if (cellSize !== prev) {
           updateUI();
         }
+        positionTopBar();
+        positionLeaderboard();
       });
       
       // Init
       loadBestScore();
+      loadPlayerName();
       startNewGame();
       fetchLeaderboard();
+      positionTopBar();
+      positionLeaderboard();
     </script>
   </body>
   </html>
