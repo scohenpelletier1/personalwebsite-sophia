@@ -2,18 +2,44 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
+    // Leaderboard: public read, authenticated users can write their own record only
+    match /leaderboard/{userId} {
+      allow read: if true;
+      // Create new record: must be the authenticated user; require valid score and reasonable name
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.resource.data.score is int
+                    && request.resource.data.score >= 0
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.name.size() <= 40;
+      // Update only if improving score; name cannot be changed after creation
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.resource.data.score is int
+                    && request.resource.data.score >= resource.data.score
+                    && request.resource.data.name == resource.data.name;
+      // Never allow delete
+      allow delete: if false;
+    }
+    
+    // Planets: public read, authenticated users can create with validated fields
+    match /planets/{planetId} {
+      allow read: if true;
+      allow create: if request.auth != null
+                    && request.resource.data.keys().hasOnly(['name','diameter','planetType','isHabitable'])
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.name.size() <= 60
+                    && (!('diameter' in request.resource.data) || request.resource.data.diameter is number)
+                    && (!('planetType' in request.resource.data) || request.resource.data.planetType is string)
+                    && (!('isHabitable' in request.resource.data) || request.resource.data.isHabitable is bool);
+      // No updates/deletes from clients for safety
+      allow update, delete: if false;
+    }
+    // Everything else remains private
     match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2025, 12, 11);
+      allow read, write: if false;
     }
   }
 }

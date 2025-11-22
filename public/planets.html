@@ -490,22 +490,29 @@
       // Import Firebase functions
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
       import { getFirestore, collection, getDocs, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+      import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
       // Your Firebase configuration
-      // TODO: Replace this with your actual Firebase config from Firebase Console
-      // Go to Project Settings > General > Your apps > Firebase SDK snippet > Config
       const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
+        apiKey: "AIzaSyBfI4fKwSsMCQPELyx9Z6wJpgUgMdx7Y6Y",
         authDomain: "personalwebsite-sophia.firebaseapp.com",
         projectId: "personalwebsite-sophia",
-        storageBucket: "personalwebsite-sophia.appspot.com",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID"
+        storageBucket: "personalwebsite-sophia.firebasestorage.app",
+        messagingSenderId: "548065891909",
+        appId: "1:548065891909:web:c3fbce9724b8e01b93f52c"
       };
 
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+      const auth = getAuth(app);
+      let authed = false;
+      onAuthStateChanged(auth, (user) => {
+        authed = !!user;
+      });
+      signInAnonymously(auth).catch((e) => {
+        console.warn('Anonymous auth failed:', e && e.message ? e.message : e);
+      });
 
       // Get DOM elements
       const loadingEl = document.getElementById('loading');
@@ -707,6 +714,10 @@
             throw new Error('Planet name is required');
           }
 
+          // Ensure we're authenticated (required by rules)
+          if (!authed && !auth.currentUser) {
+            await signInAnonymously(auth).catch(() => {});
+          }
           // Add document to Firestore
           const planetsCollection = collection(db, 'planets');
           await addDoc(planetsCollection, planetData);
