@@ -475,7 +475,8 @@
       // Firebase SDK (Firestore) for leaderboard
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
       import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
-      import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs, where, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+      import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs, where, doc, updateDoc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+      import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
       
       // TODO: Replace with your actual Firebase config (same project as planets.html)
       const firebaseConfig = {
@@ -491,6 +492,19 @@
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+      const auth = getAuth(app);
+      let currentUid = null;
+      // Anonymous auth to satisfy write rules and bind a unique record per user
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          currentUid = user.uid;
+        } else {
+          currentUid = null;
+        }
+      });
+      signInAnonymously(auth).catch((e) => {
+        console.warn('Anonymous auth failed:', e && e.message ? e.message : e);
+      });
       // Analytics can fail on non-HTTPS or if not available; don't block the app
       try {
         const analytics = getAnalytics(app);
@@ -557,30 +571,32 @@
       const scoresCollection = collection(db, 'leaderboard');
       
       async function upsertLeaderboardScore(playerName, playerScore) {
-        // Find existing record for this name (case-sensitive match)
-        const existingQ = query(scoresCollection, where('name', '==', playerName), limit(1));
-        const existingSnap = await getDocs(existingQ);
-        if (existingSnap.empty) {
-          await addDoc(scoresCollection, {
+        if (!currentUid) {
+          // ensure auth before write
+          await signInAnonymously(auth).catch(() => {});
+          if (!auth.currentUser) return false;
+          currentUid = auth.currentUser.uid;
+        }
+        const ref = doc(db, 'leaderboard', currentUid);
+        const snap = await getDoc(ref);
+        if (!snap.exists()) {
+          await setDoc(ref, {
             name: playerName,
             score: playerScore,
             createdAt: serverTimestamp()
           });
           return true;
-        } else {
-          const existingDoc = existingSnap.docs[0];
-          const data = existingDoc.data() || {};
-          const prevScore = typeof data.score === 'number' ? data.score : 0;
-          if (playerScore > prevScore) {
-            const ref = doc(db, 'leaderboard', existingDoc.id);
-            await updateDoc(ref, {
-              score: playerScore,
-              createdAt: serverTimestamp()
-            });
-            return true;
-          }
-          return false;
         }
+        const data = snap.data() || {};
+        const prevScore = typeof data.score === 'number' ? data.score : 0;
+        if (playerScore > prevScore) {
+          await updateDoc(ref, {
+            score: playerScore,
+            createdAt: serverTimestamp()
+          });
+          return true;
+        }
+        return false;
       }
       
       function loadBestScore() {

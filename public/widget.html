@@ -255,6 +255,20 @@
         overflow: hidden;
         position: relative;
       }
+      
+      /* Keep model visible while adjusting controls */
+      .sim-layout {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+        align-items: start;
+      }
+      .sim-left {
+        position: static;
+      }
+      .sim-right {
+        position: static;
+      }
 
       .sim-caption {
         display: grid;
@@ -303,6 +317,17 @@
         .project-content {
           grid-template-columns: 1fr;
         }
+        
+        .sim-layout {
+          grid-template-columns: 1fr;
+        }
+        .sim-left,
+        .sim-right {
+          position: static;
+          top: auto;
+          max-height: none;
+          overflow: visible;
+        }
 
         nav ul {
           gap: 1.5rem;
@@ -336,63 +361,67 @@
         <div class="project-main">
           <h2>Interactive Simulation</h2>
 
-          <div class="controls">
-            <div class="control">
-              <label for="presetSelect">Planet preset</label>
-              <select id="presetSelect" style="width: 100%; background:#1a1a1a; color:#fff; border:1px solid rgba(255,255,255,0.1); padding:0.6rem 0.5rem; border-radius:8px;">
-                <option value="custom" selected>Custom (manual)</option>
-                <option value="mercury">Mercury</option>
-                <option value="venus">Venus</option>
-                <option value="earth">Earth</option>
-                <option value="mars">Mars</option>
-                <option value="jupiter">Jupiter</option>
-                <option value="saturn">Saturn</option>
-                <option value="uranus">Uranus</option>
-                <option value="neptune">Neptune</option>
-              </select>
-            </div>
-            <div class="control">
-              <label for="eccSlider">Eccentricity e <span class="value" id="eccVal">0.30</span></label>
-              <input id="eccSlider" type="range" min="0" max="0.9" step="0.01" value="0.30">
-            </div>
-            <div class="control">
-              <label for="aSlider">Semi‑major axis a (AU) <span class="value" id="aVal">1.00</span></label>
-              <input id="aSlider" type="range" min="0.2" max="35" step="0.01" value="1">
-            </div>
-            <div class="control">
-              <label for="speedSlider">Time scale <span class="value" id="speedVal">1.0×</span></label>
-              <input id="speedSlider" type="range" min="0.1" max="5" step="0.1" value="1">
-            </div>
-            <div class="control">
-              <div class="control-row">
-                <label class="toggle">
-                  <input id="angleToggle" type="checkbox" checked>
-                  Show foci angle
-                </label>
-                <label class="toggle">
-                  <input id="velToggle" type="checkbox" checked>
-                  Show velocity
-                </label>
+          <div class="sim-layout">
+            <div class="sim-left">
+              <div class="sim-container">
+                <canvas id="simCanvas" style="width: 100%; height: 520px; display: block;"></canvas>
               </div>
-              <div class="control-row" style="margin-top: 0.5rem;">
-                <button id="pauseBtn" class="control-btn">Pause</button>
-                <button id="resetBtn" class="control-btn secondary">Reset</button>
+              <div class="sim-caption">
+                <div>
+                  <span class="legend"><span class="dot star"></span> Star (focus)</span>
+                  <span class="legend"><span class="dot planet"></span> Planet</span>
+                  <span class="legend"><span class="dot focus2"></span> Other focus</span>
+                </div>
+                <div class="readout" id="readout1">r: — AU • v: — AU/yr</div>
+                <div class="readout" id="readout2">Perihelion: — AU • Aphelion: — AU • Period: — yr</div>
               </div>
             </div>
-          </div>
-
-          <div class="sim-container">
-            <canvas id="simCanvas" style="width: 100%; height: 520px; display: block;"></canvas>
-          </div>
-
-          <div class="sim-caption">
-            <div>
-              <span class="legend"><span class="dot star"></span> Star (focus)</span>
-              <span class="legend"><span class="dot planet"></span> Planet</span>
-              <span class="legend"><span class="dot focus2"></span> Other focus</span>
+            <div class="sim-right">
+              <div class="controls">
+                <div class="control">
+                  <label for="presetSelect">Planet preset</label>
+                  <select id="presetSelect" style="width: 100%; background:#1a1a1a; color:#fff; border:1px solid rgba(255,255,255,0.1); padding:0.6rem 0.5rem; border-radius:8px;">
+                    <option value="custom" selected>Custom (manual)</option>
+                    <option value="mercury">Mercury</option>
+                    <option value="venus">Venus</option>
+                    <option value="earth">Earth</option>
+                    <option value="mars">Mars</option>
+                    <option value="jupiter">Jupiter</option>
+                    <option value="saturn">Saturn</option>
+                    <option value="uranus">Uranus</option>
+                    <option value="neptune">Neptune</option>
+                  </select>
+                </div>
+                <div class="control">
+                  <label for="eccSlider">Eccentricity e <span class="value" id="eccVal">0.30</span></label>
+                  <input id="eccSlider" type="range" min="0" max="0.9" step="0.01" value="0.30">
+                </div>
+                <div class="control">
+                  <label for="aSlider">Semi‑major axis a (AU) <span class="value" id="aVal">1.00</span></label>
+                  <input id="aSlider" type="range" min="0.2" max="35" step="0.01" value="1">
+                </div>
+                <div class="control">
+                  <label for="speedSlider">Time scale <span class="value" id="speedVal">1.0×</span></label>
+                  <input id="speedSlider" type="range" min="0.1" max="5" step="0.1" value="1">
+                </div>
+                <div class="control">
+                  <div class="control-row">
+                    <label class="toggle">
+                      <input id="angleToggle" type="checkbox" checked>
+                      Show foci angle
+                    </label>
+                    <label class="toggle">
+                      <input id="velToggle" type="checkbox" checked>
+                      Show velocity
+                    </label>
+                  </div>
+                  <div class="control-row" style="margin-top: 0.5rem;">
+                    <button id="pauseBtn" class="control-btn">Pause</button>
+                    <button id="resetBtn" class="control-btn secondary">Reset</button>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="readout" id="readout1">r: — AU • v: — AU/yr</div>
-            <div class="readout" id="readout2">Perihelion: — AU • Aphelion: — AU • Period: — yr</div>
           </div>
         </div>
 
@@ -758,24 +787,53 @@
           drawStar(cx, cy);
           const px = cx + p.x * scale;
           const py = cy - p.y * scale;
-          // optionally draw other focus and angle at planet
+          // connector and optional angle guides
           let angleText = '';
           if (state.showFociAngle) {
+            // Always draw the connector from planet to star (focus) even if e = 0
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255,255,255,0.9)'; // white connector
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(cx, cy);
+            ctx.stroke();
+            ctx.restore();
+            // If e > 0, show other focus line and the angle arc
             const c = a * state.e;
-            const f2x = cx + (-2 * c) * scale;
-            const f2y = cy;
             if (state.e > 1e-6) {
+              const f2x = cx + (-2 * c) * scale;
+              const f2y = cy;
               drawOtherFocus(f2x, f2y);
-              const v1x = cx - px, v1y = cy - py;
-              const v2x = f2x - px, v2y = f2y - py;
-              const dot = v1x * v2x + v1y * v2y;
-              const m1 = Math.hypot(v1x, v1y), m2 = Math.hypot(v2x, v2y);
-              if (m1 > 1e-9 && m2 > 1e-9) {
-                let cosA = dot / (m1 * m2);
-                cosA = Math.max(-1, Math.min(1, cosA));
-                const ang = Math.acos(cosA);
-                drawFociAngle(px, py, cx, cy, f2x, f2y, ang);
-              }
+              // line to other focus
+              ctx.save();
+              ctx.strokeStyle = 'rgba(148, 163, 184, 0.6)';
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(px, py);
+              ctx.lineTo(f2x, f2y);
+              ctx.stroke();
+              // arc angle between star and other focus as seen from planet
+              const a1 = Math.atan2(cy - py, cx - px);
+              const a2 = Math.atan2(f2y - py, f2x - px);
+              let start = a1, end = a2;
+              let d = ((end - start + Math.PI) % (2 * Math.PI)) - Math.PI;
+              end = start + d;
+              const rr = 26;
+              ctx.beginPath();
+              ctx.strokeStyle = 'rgba(99, 102, 241, 0.9)';
+              ctx.lineWidth = 2;
+              ctx.arc(px, py, rr, start, end, d < 0);
+              ctx.stroke();
+              // label
+              const mid = start + d / 2;
+              const lx = px + (rr + 12) * Math.cos(mid);
+              const ly = py + (rr + 12) * Math.sin(mid);
+              ctx.fillStyle = 'rgba(203,213,225,0.95)';
+              ctx.font = '12px Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+              const deg = (Math.abs(d) * 180 / Math.PI).toFixed(1) + '°';
+              ctx.fillText(deg, lx, ly);
+              ctx.restore();
             }
           }
           if (state.showVelocity) drawVelocity(px, py, vx, vy, scale);
